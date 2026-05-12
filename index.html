@@ -18,13 +18,12 @@
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
     --gray-400: #9ca3af;
+    --gray-500: #6b7280;
     --gray-600: #4b5563;
     --gray-800: #1f2937;
-    --red: #ef4444;
     --red-light: #fee2e2;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 16px rgba(34,197,94,0.12), 0 2px 6px rgba(0,0,0,0.06);
-    --shadow-lg: 0 8px 32px rgba(34,197,94,0.18), 0 4px 12px rgba(0,0,0,0.08);
+    --blue-light: #eff6ff;
+    --shadow-lg: 0 8px 32px rgba(34,197,94,0.15), 0 4px 12px rgba(0,0,0,0.08);
     --radius: 16px;
     --radius-sm: 10px;
   }
@@ -42,20 +41,16 @@
     position: relative;
     overflow-x: hidden;
   }
-
-  /* 배경 장식 */
   body::before {
     content: '';
-    position: fixed;
-    top: -120px; left: -120px;
+    position: fixed; top: -120px; left: -120px;
     width: 400px; height: 400px;
     background: radial-gradient(circle, rgba(134,239,172,0.35) 0%, transparent 70%);
     pointer-events: none;
   }
   body::after {
     content: '';
-    position: fixed;
-    bottom: -100px; right: -100px;
+    position: fixed; bottom: -100px; right: -100px;
     width: 350px; height: 350px;
     background: radial-gradient(circle, rgba(34,197,94,0.18) 0%, transparent 70%);
     pointer-events: none;
@@ -65,428 +60,443 @@
     background: var(--white);
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
-    width: 100%;
-    max-width: 440px;
+    width: 100%; max-width: 440px;
     overflow: hidden;
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
   }
 
   /* 헤더 */
   .header {
     background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-    padding: 28px 32px 24px;
-    position: relative;
-    overflow: hidden;
+    padding: 24px 28px 22px;
+    position: relative; overflow: hidden;
   }
   .header::before {
     content: '';
-    position: absolute;
-    top: -30px; right: -30px;
+    position: absolute; top: -30px; right: -30px;
     width: 130px; height: 130px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 50%;
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    bottom: -40px; right: 40px;
-    width: 90px; height: 90px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 50%;
+    background: rgba(255,255,255,0.08); border-radius: 50%;
   }
   .header-icon {
-    width: 44px; height: 44px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 12px;
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.2); border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 12px;
-    font-size: 22px;
+    margin-bottom: 10px; font-size: 20px;
   }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: -0.3px;
-    margin-bottom: 4px;
+  .header h1 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .header p { font-size: 12.5px; color: rgba(255,255,255,0.75); line-height: 1.5; }
+
+  /* 스텝 바 */
+  .steps {
+    display: flex; align-items: center;
+    padding: 14px 28px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
   }
-  .header p {
-    font-size: 13px;
-    color: rgba(255,255,255,0.75);
-    font-weight: 400;
-    line-height: 1.5;
+  .step { display: flex; align-items: center; gap: 6px; flex: 1; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0; transition: all 0.3s;
+  }
+  .step-label { font-size: 12px; font-weight: 600; transition: color 0.3s; white-space: nowrap; }
+  .step.inactive .step-num { background: var(--gray-200); color: var(--gray-400); }
+  .step.inactive .step-label { color: var(--gray-400); }
+  .step.active .step-num { background: var(--green); color: #fff; }
+  .step.active .step-label { color: var(--gray-800); }
+  .step.done .step-num { background: var(--green-light); color: var(--green-dark); }
+  .step.done .step-label { color: var(--green-dark); }
+  .step-line {
+    flex: 0 0 28px; height: 1.5px; background: var(--gray-200);
+    margin: 0 4px; transition: background 0.3s;
+  }
+  .step-line.done { background: var(--green); }
+
+  /* 패널 */
+  .panel { padding: 24px 28px 28px; display: none; animation: slideIn 0.3s ease; }
+  .panel.active { display: block; }
+  .success-screen { padding: 20px 28px 32px; display: none; text-align: center; animation: slideIn 0.3s ease; }
+  .success-screen.active { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 폼 영역 */
-  .body {
-    padding: 28px 32px 32px;
-  }
-
-  .field {
-    margin-bottom: 20px;
-  }
-
+  /* 공통 필드 */
+  .field { margin-bottom: 18px; }
   .field label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-600);
-    margin-bottom: 8px;
-    letter-spacing: 0.1px;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; color: var(--gray-600); margin-bottom: 7px;
   }
-
   .field label .dot {
-    width: 6px; height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    flex-shrink: 0;
+    width: 5px; height: 5px; background: var(--green); border-radius: 50%; flex-shrink: 0;
   }
-
-  .input-wrap {
-    position: relative;
-  }
-
+  .input-wrap { position: relative; }
   .input-wrap input {
     width: 100%;
-    padding: 14px 16px 14px 44px;
+    padding: 13px 14px 13px 42px;
     border: 1.5px solid var(--gray-200);
     border-radius: var(--radius-sm);
     font-size: 16px;
     font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 600;
-    color: var(--gray-800);
-    background: var(--gray-50);
-    outline: none;
+    font-weight: 600; color: var(--gray-800);
+    background: var(--gray-50); outline: none;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    -webkit-appearance: none;
-    letter-spacing: 0.5px;
+    -webkit-appearance: none; letter-spacing: 0.3px;
   }
-
-  .input-wrap input::placeholder {
-    color: var(--gray-400);
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-
+  .input-wrap input::placeholder { color: var(--gray-400); font-weight: 400; letter-spacing: 0; }
   .input-wrap input:focus {
-    border-color: var(--green);
-    background: var(--white);
+    border-color: var(--green); background: var(--white);
     box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
   }
-
   .input-wrap .icon {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 18px;
-    pointer-events: none;
-    opacity: 0.5;
-    transition: opacity 0.2s;
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%); font-size: 16px; pointer-events: none; opacity: 0.45;
   }
 
-  .input-wrap input:focus ~ .icon,
-  .input-wrap:has(input:focus) .icon {
-    opacity: 1;
+  /* 현재 전화번호 박스 */
+  .current-box {
+    background: var(--blue-light); border: 1.5px solid #bfdbfe;
+    border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 18px;
   }
+  .cb-label { font-size: 11px; color: #3b82f6; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .cb-chart { font-size: 12px; color: var(--gray-500); margin-bottom: 8px; }
+  .cb-chart strong { color: var(--gray-800); font-weight: 700; }
+  .cb-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; padding: 5px 0;
+    border-top: 1px solid rgba(59,130,246,0.12);
+  }
+  .cb-row:first-of-type { border-top: none; }
+  .cb-src {
+    font-size: 11px; color: var(--gray-500);
+    background: rgba(59,130,246,0.1); padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  }
+  .cb-num { font-size: 16px; font-weight: 700; color: #1e40af; letter-spacing: 0.5px; }
 
-  /* 구분선 */
-  .divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 4px 0 20px;
-    color: var(--gray-400);
-    font-size: 12px;
-  }
-  .divider::before, .divider::after {
-    content: ''; flex: 1;
-    height: 1px; background: var(--gray-200);
+  /* 화살표 */
+  .arrow-row {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 4px 0 16px; color: var(--gray-400); font-size: 12px; font-weight: 500;
   }
 
   /* 버튼 */
   .btn {
-    width: 100%;
-    padding: 16px;
+    width: 100%; padding: 15px;
     background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 16px;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 0.5px;
+    color: #fff; border: none; border-radius: var(--radius-sm);
+    font-size: 15px; font-family: 'Noto Sans KR', sans-serif; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.3px;
     transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
-    box-shadow: 0 4px 14px rgba(34,197,94,0.35);
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(34,197,94,0.3);
+    position: relative; overflow: hidden;
   }
-
   .btn::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
     transition: left 0.4s;
   }
-
   .btn:hover::before { left: 100%; }
-  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(34,197,94,0.4); }
-  .btn:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(34,197,94,0.3); }
-  .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(34,197,94,0.38); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+  .btn.gray {
+    background: var(--gray-100); color: var(--gray-600);
+    box-shadow: none; margin-top: 10px;
+  }
+  .btn.gray:hover { background: var(--gray-200); box-shadow: none; transform: none; }
 
-  .btn .spinner {
-    display: inline-block;
-    width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 5px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* 결과 메시지 */
-  .result {
-    margin-top: 16px;
-    padding: 14px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 600;
-    display: none;
-    align-items: flex-start;
-    gap: 10px;
-    line-height: 1.5;
-    animation: fadeIn 0.3s ease;
+  /* 메시지 */
+  .msg {
+    display: none; align-items: flex-start; gap: 9px;
+    padding: 12px 14px; border-radius: var(--radius-sm);
+    font-size: 13.5px; font-weight: 600; margin-bottom: 16px;
+    animation: fadeIn 0.25s ease; line-height: 1.5;
   }
-  .result.show { display: flex; }
-  .result.success {
-    background: var(--green-light);
-    color: var(--green-dark);
-    border: 1px solid var(--green-mid);
-  }
-  .result.error {
-    background: var(--red-light);
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
-  }
-  .result-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .msg.show { display: flex; }
+  .msg.error { background: var(--red-light); color: #b91c1c; border: 1px solid #fca5a5; }
+  .msg-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
+  /* 성공 */
+  .success-icon {
+    width: 64px; height: 64px; background: var(--green-light); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 16px;
   }
+  .success-screen h2 { font-size: 18px; font-weight: 700; color: var(--gray-800); margin-bottom: 8px; }
+  .success-screen p { font-size: 13px; color: var(--gray-500); line-height: 1.7; margin-bottom: 20px; }
+  .success-detail {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm); padding: 14px 16px; text-align: left;
+    margin-bottom: 20px; font-size: 13px; color: var(--gray-600); line-height: 1.9;
+  }
+  .success-detail strong { color: var(--gray-800); font-weight: 700; }
 
-  /* 결과 상세 */
-  .result-detail {
-    font-size: 12px;
-    font-weight: 400;
-    margin-top: 3px;
-    opacity: 0.8;
-  }
-
-  /* 하단 안내 */
-  .footer-note {
-    margin-top: 20px;
-    padding: 12px 14px;
-    background: var(--gray-50);
-    border-radius: 8px;
-    border: 1px solid var(--gray-200);
-    font-size: 12px;
-    color: var(--gray-600);
-    line-height: 1.6;
-  }
-  .footer-note strong {
-    font-weight: 700;
-    color: var(--gray-800);
-  }
-
-  /* 반응형 */
   @media (max-width: 480px) {
-    .header { padding: 22px 24px 20px; }
-    .body { padding: 22px 24px 28px; }
-    .input-wrap input { font-size: 15px; }
+    .header { padding: 20px 22px 18px; }
+    .panel, .success-screen { padding: 20px 22px 24px; }
+    .steps { padding: 12px 22px; }
   }
 </style>
 </head>
 <body>
-
 <div class="card">
+
   <div class="header">
     <div class="header-icon">📱</div>
     <h1>전화번호 변경</h1>
-    <p>차트번호로 등록된 전화번호를<br>새 번호로 업데이트합니다.</p>
+    <p>차트번호로 현재 전화번호를 확인하고<br>새 번호로 업데이트합니다.</p>
   </div>
 
-  <div class="body">
+  <div class="steps">
+    <div class="step active" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-label">차트 조회</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step inactive" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-label">번호 변경</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step inactive" id="step3">
+      <div class="step-num">✓</div>
+      <div class="step-label">완료</div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="panel active" id="panel1">
     <div class="field">
       <label><span class="dot"></span>차트번호</label>
       <div class="input-wrap">
-        <input
-          type="text"
-          id="phone-chart"
-          placeholder="차트번호 입력"
-          inputmode="numeric"
-          autocomplete="off"
-          spellcheck="false"
-        >
+        <input type="text" id="chart-input" placeholder="차트번호를 입력하세요"
+          inputmode="numeric" autocomplete="off" spellcheck="false">
         <span class="icon">📋</span>
       </div>
     </div>
+    <div class="msg error" id="s1-err">
+      <span class="msg-icon">⚠️</span>
+      <div id="s1-err-msg"></div>
+    </div>
+    <button class="btn" id="search-btn" onclick="searchChart()">현재 전화번호 조회</button>
+  </div>
 
-    <div class="divider">변경할 전화번호</div>
+  <!-- STEP 2 -->
+  <div class="panel" id="panel2">
+    <div class="current-box" id="current-box">
+      <div class="cb-label">📋 현재 등록된 전화번호</div>
+      <div class="cb-chart">차트번호 <strong id="display-chart"></strong></div>
+      <div id="current-phones"></div>
+    </div>
+
+    <div class="arrow-row">↓&nbsp; 아래에 새 번호를 입력하세요</div>
 
     <div class="field">
       <label><span class="dot"></span>새 전화번호</label>
       <div class="input-wrap">
-        <input
-          type="tel"
-          id="phone-new"
-          placeholder="01012345678"
-          inputmode="numeric"
-          autocomplete="off"
-          spellcheck="false"
-        >
+        <input type="tel" id="phone-new" placeholder="01012345678"
+          inputmode="numeric" autocomplete="off" spellcheck="false">
         <span class="icon">📞</span>
       </div>
     </div>
 
-    <button class="btn" id="change-btn" onclick="changePhone()">
-      전화번호 변경하기
-    </button>
-
-    <div class="result" id="phone-result">
-      <span class="result-icon" id="result-icon"></span>
-      <div>
-        <div id="result-msg"></div>
-        <div class="result-detail" id="result-detail"></div>
-      </div>
+    <div class="msg error" id="s2-err">
+      <span class="msg-icon">⚠️</span>
+      <div id="s2-err-msg"></div>
     </div>
 
-    <div class="footer-note">
-      <strong>안내</strong><br>
-      초진 및 대리 접수 기록의 전화번호가 함께 변경됩니다. 변경 후 되돌릴 수 없으니 정확히 입력해 주세요.
-    </div>
+    <button class="btn" id="change-btn" onclick="changePhone()">전화번호 변경하기</button>
+    <button class="btn gray" onclick="goBack()">← 차트번호 다시 입력</button>
   </div>
-</div>
 
+  <!-- STEP 3 완료 -->
+  <div class="success-screen" id="panel3">
+    <div class="success-icon">✅</div>
+    <h2>변경 완료!</h2>
+    <p>전화번호가 성공적으로 변경되었습니다.</p>
+    <div class="success-detail" id="success-detail"></div>
+    <button class="btn" onclick="resetApp()">다른 차트 변경하기</button>
+  </div>
+
+</div>
 <script>
   const SUPA_URL  = 'https://rurbfcocihvapbtdzbyt.supabase.co';
   const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1cmJmY29jaWh2YXBidGR6Ynl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTUzMzQsImV4cCI6MjA5MjUzMTMzNH0.Y89bwZlS5ciqfhF9IRbF8oGa9CmFRsP6msFbp7DVypc';
 
-  const chartInput = document.getElementById('phone-chart');
-  const phoneInput = document.getElementById('phone-new');
-  const btn = document.getElementById('change-btn');
-  const resultEl = document.getElementById('phone-result');
-  const resultIcon = document.getElementById('result-icon');
-  const resultMsg = document.getElementById('result-msg');
-  const resultDetail = document.getElementById('result-detail');
+  const H = { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_ANON}` };
+  const HJ = { ...H, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
 
-  // 엔터키로 변경 실행
-  [chartInput, phoneInput].forEach(el => {
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') changePhone();
+  let found = { cjIds: [], drIds: [], chart: '' };
+
+  document.getElementById('chart-input').addEventListener('keydown', e => { if (e.key === 'Enter') searchChart(); });
+  document.getElementById('phone-new').addEventListener('keydown', e => { if (e.key === 'Enter') changePhone(); });
+
+  function fmt(p) {
+    if (!p) return '(없음)';
+    const d = p.replace(/[^0-9]/g, '');
+    if (d.length === 11) return d.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+    if (d.length === 10) return d.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+    return p;
+  }
+
+  function setSteps(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById('step'+i).className = 'step ' + (i < n ? 'done' : i === n ? 'active' : 'inactive');
     });
-  });
+    [1,2].forEach(i => {
+      document.getElementById('line'+i).className = 'step-line' + (i < n ? ' done' : '');
+    });
+  }
 
-  function showResult(type, msg, detail = '') {
-    resultEl.className = 'result show ' + type;
-    resultIcon.textContent = type === 'success' ? '✅' : '⚠️';
-    resultMsg.textContent = msg;
-    resultDetail.textContent = detail;
+  function showPanel(n) {
+    setSteps(n);
+    document.getElementById('panel1').className = n === 1 ? 'panel active' : 'panel';
+    document.getElementById('panel2').className = n === 2 ? 'panel active' : 'panel';
+    document.getElementById('panel3').className = n === 3 ? 'success-screen active' : 'success-screen';
+  }
+
+  function showErr(id, msgId, txt) {
+    document.getElementById(id).className = 'msg error show';
+    document.getElementById(msgId).textContent = txt;
+  }
+  function hideErr(id) { document.getElementById(id).className = 'msg error'; }
+
+  async function searchChart() {
+    const chart = document.getElementById('chart-input').value.trim();
+    hideErr('s1-err');
+    if (!chart) { showErr('s1-err','s1-err-msg','차트번호를 입력해 주세요.'); return; }
+
+    const btn = document.getElementById('search-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>조회 중...';
+
+    let cjData = [], drData = [];
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/chojin?chart=eq.${encodeURIComponent(chart)}&select=id,phone`, { headers: H });
+      const d = await r.json();
+      if (Array.isArray(d)) cjData = d;
+    } catch(e) { console.error('chojin fetch error:', e); }
+
+    try {
+      const r = await fetch(`${SUPA_URL}/rest/v1/daeri?chart=eq.${encodeURIComponent(chart)}&select=id,visitor_phone`, { headers: H });
+      const d = await r.json();
+      if (Array.isArray(d)) drData = d;
+    } catch(e) { console.error('daeri fetch error:', e); }
+
+    btn.disabled = false;
+    btn.innerHTML = '현재 전화번호 조회';
+
+    if (cjData.length === 0 && drData.length === 0) {
+      showErr('s1-err','s1-err-msg',`차트번호 "${chart}"를 찾을 수 없습니다.`);
+      return;
+    }
+
+    found = {
+      cjIds: cjData.map(r => r.id),
+      drIds: drData.map(r => r.id),
+      chart
+    };
+
+    document.getElementById('display-chart').textContent = chart;
+    let html = '';
+    if (cjData.length > 0) {
+      const phones = [...new Set(cjData.map(r => r.phone).filter(Boolean))];
+      html += `<div class="cb-row">
+        <span class="cb-src">초진접수 ${cjData.length}건</span>
+        <span class="cb-num">${fmt(phones[0] || '')}</span>
+      </div>`;
+    }
+    if (drData.length > 0) {
+      const phones = [...new Set(drData.map(r => r.visitor_phone).filter(Boolean))];
+      html += `<div class="cb-row">
+        <span class="cb-src">대리접수 ${drData.length}건</span>
+        <span class="cb-num">${fmt(phones[0] || '')}</span>
+      </div>`;
+    }
+    document.getElementById('current-phones').innerHTML = html;
+    document.getElementById('phone-new').value = '';
+    hideErr('s2-err');
+    showPanel(2);
+    setTimeout(() => document.getElementById('phone-new').focus(), 300);
   }
 
   async function changePhone() {
-    const chart = chartInput.value.trim();
-    const phone = phoneInput.value.trim();
+    const phone = document.getElementById('phone-new').value.trim();
+    const clean = phone.replace(/[^0-9]/g, '');
+    hideErr('s2-err');
 
-    if (!chart || !phone) {
-      showResult('error', '차트번호와 전화번호를 모두 입력해 주세요.');
-      return;
+    if (!phone) { showErr('s2-err','s2-err-msg','새 전화번호를 입력해 주세요.'); return; }
+    if (clean.length < 9 || clean.length > 11) {
+      showErr('s2-err','s2-err-msg','전화번호 형식이 올바르지 않습니다. (9~11자리 숫자)'); return;
     }
 
-    // 전화번호 간단 유효성
-    const phoneClean = phone.replace(/[^0-9]/g, '');
-    if (phoneClean.length < 9 || phoneClean.length > 11) {
-      showResult('error', '전화번호 형식이 올바르지 않습니다.', '9~11자리 숫자로 입력해 주세요.');
-      return;
-    }
-
+    const btn = document.getElementById('change-btn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>변경 중...';
-    resultEl.className = 'result';
 
     let updated = 0;
     const details = [];
 
-    try {
-      // 1) chojin 테이블: phone 컬럼
-      const chkCj = await fetch(
-        `${SUPA_URL}/rest/v1/chojin?chart=eq.${encodeURIComponent(chart)}&select=id`,
-        { headers: { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_ANON}` } }
-      );
-      const cjData = await chkCj.json();
-      if (Array.isArray(cjData) && cjData.length > 0) {
-        await fetch(
-          `${SUPA_URL}/rest/v1/chojin?chart=eq.${encodeURIComponent(chart)}`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${SUPA_ANON}`,
-              'apikey': SUPA_ANON,
-              'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({ phone: phoneClean })
-          }
+    if (found.cjIds.length > 0) {
+      try {
+        const r = await fetch(
+          `${SUPA_URL}/rest/v1/chojin?chart=eq.${encodeURIComponent(found.chart)}`,
+          { method: 'PATCH', headers: HJ, body: JSON.stringify({ phone: clean }) }
         );
-        updated += cjData.length;
-        details.push(`초진접수 ${cjData.length}건`);
-      }
-    } catch(e) { console.error('chojin 업데이트 오류:', e); }
+        if (r.ok) { updated += found.cjIds.length; details.push(`초진접수 ${found.cjIds.length}건`); }
+        else { console.error('chojin PATCH failed', r.status, await r.text()); }
+      } catch(e) { console.error(e); }
+    }
 
-    try {
-      // 2) daeri 테이블: visitor_phone 컬럼
-      const chkDr = await fetch(
-        `${SUPA_URL}/rest/v1/daeri?chart=eq.${encodeURIComponent(chart)}&select=id`,
-        { headers: { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${SUPA_ANON}` } }
-      );
-      const drData = await chkDr.json();
-      if (Array.isArray(drData) && drData.length > 0) {
-        await fetch(
-          `${SUPA_URL}/rest/v1/daeri?chart=eq.${encodeURIComponent(chart)}`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${SUPA_ANON}`,
-              'apikey': SUPA_ANON,
-              'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify({ visitor_phone: phoneClean })
-          }
+    if (found.drIds.length > 0) {
+      try {
+        const r = await fetch(
+          `${SUPA_URL}/rest/v1/daeri?chart=eq.${encodeURIComponent(found.chart)}`,
+          { method: 'PATCH', headers: HJ, body: JSON.stringify({ visitor_phone: clean }) }
         );
-        updated += drData.length;
-        details.push(`대리접수 ${drData.length}건`);
-      }
-    } catch(e) { console.error('daeri 업데이트 오류:', e); }
+        if (r.ok) { updated += found.drIds.length; details.push(`대리접수 ${found.drIds.length}건`); }
+        else { console.error('daeri PATCH failed', r.status, await r.text()); }
+      } catch(e) { console.error(e); }
+    }
 
     btn.disabled = false;
     btn.innerHTML = '전화번호 변경하기';
 
     if (updated > 0) {
-      showResult(
-        'success',
-        `총 ${updated}건 변경 완료`,
-        details.join(' · ') + ` → ${phoneClean}`
-      );
-      chartInput.value = '';
-      phoneInput.value = '';
-      chartInput.focus();
+      document.getElementById('success-detail').innerHTML =
+        `<strong>차트번호</strong>　${found.chart}<br>`
+        + `<strong>변경된 번호</strong>　${fmt(clean)}<br>`
+        + `<strong>변경 건수</strong>　${details.join(', ')} · 총 ${updated}건`;
+      showPanel(3);
     } else {
-      showResult('error', '해당 차트번호를 찾을 수 없습니다.', '차트번호를 다시 확인해 주세요.');
+      showErr('s2-err','s2-err-msg','변경 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     }
+  }
+
+  function goBack() {
+    hideErr('s1-err');
+    showPanel(1);
+    setTimeout(() => document.getElementById('chart-input').focus(), 100);
+  }
+
+  function resetApp() {
+    document.getElementById('chart-input').value = '';
+    document.getElementById('phone-new').value = '';
+    hideErr('s1-err'); hideErr('s2-err');
+    found = { cjIds: [], drIds: [], chart: '' };
+    showPanel(1);
+    setTimeout(() => document.getElementById('chart-input').focus(), 100);
   }
 </script>
 </body>
