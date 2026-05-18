@@ -118,6 +118,9 @@ tr:last-child td{border-bottom:none;}tr:hover td{background:#fafbff;}
 .clin-score-footer{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
 .clin-score-big{font-size:30px;font-weight:700;color:var(--accent);line-height:1;}
 .clin-score-actions{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;}
+.clin-score-interp{font-size:13px;color:var(--text2);}
+.clin-score-interp strong{color:var(--text);font-size:14px;}
+.clin-item-input{padding:4px 18px 14px;display:flex;align-items:center;gap:12px;}
 .clin-sub-scores{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--text2);margin-top:6px;}
 .clin-sub-item{display:flex;justify-content:space-between;gap:8px;}
 .clin-sub-val{font-weight:700;color:var(--text);}
@@ -2370,10 +2373,10 @@ function showPanel(id) {
 
 function renderPanel(id) {
   const container = document.getElementById('mainContent');
+  if(!container) return;
   const scale = CLIN_SCALES[id];
-  // APPQ 전용 class 토글
-  container.classList.toggle('scale-appq', id === 'appq');
-  // Save print-info bar HTML before overwriting
+  if(!scale) return;
+  // printInfoBar는 없을 수 있으므로 null 처리
   const printBar = document.getElementById('printInfoBar');
   const printBarHTML = printBar ? printBar.outerHTML : '';
 
@@ -2407,7 +2410,7 @@ function renderPanel(id) {
       html += `
         <div class="clin-item-card" id="card-${id}-${idx}">
           <div class="clin-item-header"><span class="clin-item-num">${idx+1}</span>${item.q}</div>
-          <div class="item-input">
+          <div class="clin-item-input">
             <input type="number" class="clin-num-input" id="ninput-${id}-${idx}"
               placeholder="${item.placeholder||''}" min="0"
               onchange="setNumScore('${id}',${idx},this.value)">
@@ -2446,7 +2449,7 @@ function renderScoreFooter(id) {
         <div class="clin-score-big">${total}</div>
         <div style="font-size:11px;color:var(--text3);margin-top:2px;">총점</div>
       </div>
-      <div class="score-interp">
+      <div class="clin-score-interp">
         <strong>${interp}</strong>
       </div>
       <div class="clin-score-actions">
@@ -2480,7 +2483,7 @@ function selectScore(scaleId, itemIdx, score) {
   const scale = CLIN_SCALES[scaleId];
   const item = scale.items[itemIdx];
   card.classList.add('scored');
-  card.querySelector('.options').innerHTML = item.opts.map((opt,si)=>`
+  card.querySelector('.clin-options').innerHTML = item.opts.map((opt,si)=>`
     <button class="clin-opt-btn ${score===si?'selected':''}"
       onclick="selectScore('${scaleId}',${itemIdx},${si})">
       <span class="clin-opt-score">${si}</span>
@@ -2496,13 +2499,13 @@ function setNumScore(scaleId, itemIdx, val) {
 }
 
 function updateFooter(id) {
-  const footer = document.querySelector('.score-footer');
+  const footer = document.querySelector('.clin-score-footer');
   if(!footer) return;
   const scale = CLIN_SCALES[id];
   const total = calcTotal(id);
   const interp = scale.interpret(total);
-  footer.querySelector('.score-big').textContent = total;
-  footer.querySelector('.score-interp strong').textContent = interp;
+  footer.querySelector('.clin-score-big').textContent = total;
+  footer.querySelector('.clin-score-interp strong').textContent = interp;
 }
 
 function updateBadge(id) {
@@ -2586,13 +2589,13 @@ window.bprsSelect = function(idx, si) {
   scores.bprs[idx] = si;
   const card = document.getElementById(`card-bprs-${idx}`);
   card.classList.add('scored');
-  card.querySelector('.options-row').innerHTML = CLIN_SCALES.bprs.items[idx].opts.map((opt,s2)=>`
+  card.querySelector('.clin-options-row').innerHTML = CLIN_SCALES.bprs.items[idx].opts.map((opt,s2)=>`
     <button class="clin-opt-chip ${si===s2?'selected':''}"
       onclick="bprsSelect(${idx},${s2})">${opt}</button>`).join('');
   const total = calcTotal('bprs');
   const s = scores.bprs;
-  document.querySelector('#bprs-footer .score-big').textContent = total;
-  document.querySelector('#bprs-footer .sub-scores').innerHTML = `
+  document.querySelector('#bprs-footer .clin-score-big').textContent = total;
+  document.querySelector('#bprs-footer .clin-sub-scores').innerHTML = `
     <div class="clin-sub-item"><span>사고장애 (4,12,15)</span><span class="clin-sub-val">${(s[3]||0)+(s[11]||0)+(s[14]||0)}</span></div>
     <div class="clin-sub-item"><span>적대의심 (10,11,14)</span><span class="clin-sub-val">${(s[9]||0)+(s[10]||0)+(s[13]||0)}</span></div>
     <div class="clin-sub-item"><span>철퇴지연 (3,13,16)</span><span class="clin-sub-val">${(s[2]||0)+(s[12]||0)+(s[15]||0)}</span></div>
@@ -2649,7 +2652,7 @@ function renderMMSE() {
         <div class="clin-score-big">${mmseTotal}</div>
         <div style="font-size:11px;color:var(--text3);margin-top:2px">MMSE 총점</div>
       </div>
-      <div class="score-interp">
+      <div class="clin-score-interp">
         <strong>GDS ${gdsSelected ? '단계 '+gdsSelected : '미선택'}</strong>
       </div>
       <div class="clin-score-actions">
@@ -2666,20 +2669,20 @@ window.mmseSet = function(idx, val) {
   mmseScores[idx] = val;
   const card = document.getElementById(`mmse-card-${idx}`);
   card.classList.add('scored');
-  card.querySelectorAll('.opt-chip').forEach((btn,i)=>{
+  card.querySelectorAll('.clin-opt-chip').forEach((btn,i)=>{
     btn.classList.toggle('selected', i===0? val===1 : val===0);
   });
   const total = mmseScores.filter(s=>s===1).length;
-  document.querySelector('#mmse-footer .score-big').textContent = total;
+  document.querySelector('#mmse-footer .clin-score-big').textContent = total;
   updateBadge('mmse');
 };
 window.gdsSet = function(n) {
   gdsSelected = n;
-  document.querySelectorAll('.gds-opt').forEach(el=>{
+  document.querySelectorAll('.clin-gds-opt').forEach(el=>{
     el.classList.remove('selected');
   });
   document.getElementById(`gds-${n}`).classList.add('selected');
-  document.querySelector('#mmse-footer .score-interp strong').textContent = 'GDS 단계 '+n;
+  document.querySelector('#mmse-footer .clin-score-interp strong').textContent = 'GDS 단계 '+n;
 };
 
 // ═══════════════════════════════════════════════════
@@ -2733,7 +2736,7 @@ function renderPSQI() {
         <div style="font-size:11px;color:var(--text3);margin-top:2px">총점</div>
       </div>
       <div>
-        <div class="score-interp"><strong>${scale.interpret(psqi.total)}</strong></div>
+        <div class="clin-score-interp"><strong>${scale.interpret(psqi.total)}</strong></div>
         <div class="clin-psqi-comps">
           <div class="clin-psqi-comp"><div class="clin-psqi-comp-name">주관적 수면질</div><div class="clin-psqi-comp-val">${psqi.c1}</div></div>
           <div class="clin-psqi-comp"><div class="clin-psqi-comp-name">수면 잠복기</div><div class="clin-psqi-comp-val">${psqi.c2}</div></div>
@@ -2759,7 +2762,7 @@ function psqiNumItem(key, label, ph, inputId) {
   return `
     <div class="clin-item-card ${curVal !== '' ? 'scored' : ''}">
       <div class="clin-item-header" style="padding-bottom:4px">${label}</div>
-      <div class="item-input">
+      <div class="clin-item-input">
         <input type="number" class="clin-num-input" placeholder="${ph}" id="psqi-${key}"
           value="${curVal}"
           oninput="psqiNumSet('${key}', parseFloat(this.value)||0)">
@@ -2813,8 +2816,8 @@ function updatePSQIFooter() {
   const footer = document.getElementById('psqi-footer');
   if(!footer) return;
   const psqi = calcPSQI();
-  footer.querySelector('.score-big').textContent = psqi.total;
-  footer.querySelector('.score-interp strong').textContent = CLIN_SCALES.psqi.interpret(psqi.total);
+  footer.querySelector('.clin-score-big').textContent = psqi.total;
+  footer.querySelector('.clin-score-interp strong').textContent = CLIN_SCALES.psqi.interpret(psqi.total);
   const comps = footer.querySelectorAll('.psqi-comp-val');
   [psqi.c1,psqi.c2,psqi.c3,psqi.c4,psqi.c5,psqi.c6,psqi.c7].forEach((v,i)=>comps[i].textContent=v);
 }
@@ -2923,7 +2926,7 @@ function savePDF(id) {
   if(!mainEl) { showToast('콘텐츠를 찾을 수 없습니다.'); return; }
   const clone = mainEl.cloneNode(true);
   // Remove action buttons and print-info bar
-  clone.querySelectorAll('.score-actions, #printInfoBar').forEach(el => el.remove());
+  clone.querySelectorAll('.clin-score-actions, #printInfoBar').forEach(el => el.remove());
 
   const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -2937,7 +2940,7 @@ ${allStyles}
 body { font-family: 'Noto Sans KR', sans-serif; background: #fff; color: #1a1f36; padding: 16px 20px; }
 .print-header { display: flex; justify-content: space-between; font-size: 11px; color: #555; border-bottom: 1px solid #ccc; padding-bottom: 6px; margin-bottom: 14px; }
 .main { padding: 0 !important; max-width: 100% !important; }
-.score-actions { display: none !important; }
+.clin-score-actions { display: none !important; }
 @media print {
   @page { size: A4 portrait; margin: 10mm 12mm; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
