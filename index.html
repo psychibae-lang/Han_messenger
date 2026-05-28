@@ -201,6 +201,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="admin-tabs">
       <button class="admin-tab on" onclick="switchAdminTab('accounts')">⚙️ 계정</button>
       <button class="admin-tab" onclick="switchAdminTab('logs')">📋 통화기록</button>
+      <button class="admin-tab" onclick="switchAdminTab('chats')">🗑️ 대화삭제</button>
     </div>
     <!-- 계정 관리 탭 -->
     <div class="admin-pane on" id="adm-pane-accounts">
@@ -249,6 +250,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="admin-pane" id="adm-pane-logs">
       <div id="clog-list" class="clog-list"><div class="clog-empty">불러오는 중...</div></div>
       <div class="admin-btns" style="margin-top:12px;">
+        <button class="admin-cancel" onclick="closeAdmin()">닫기</button>
+      </div>
+    </div>
+    <!-- 대화내용 삭제 탭 -->
+    <div class="admin-pane" id="adm-pane-chats">
+      <div class="admin-section">
+        <div class="admin-section-title">🗑️ 대화내용 삭제</div>
+        <p style="font-size:11px;color:#888;margin-bottom:12px;line-height:1.6;">삭제할 대화를 선택하세요. 삭제 후 복구할 수 없습니다.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="chat-clear-list"></div>
+      </div>
+      <div style="margin-top:8px;">
+        <button onclick="clearAllChats()" style="width:100%;padding:9px;background:#E53E3E;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;">⚠️ 전체 대화 모두 삭제</button>
+      </div>
+      <div id="chat-clear-msg" style="font-size:11px;text-align:center;margin-top:8px;min-height:16px;color:#1D9E75;"></div>
+      <div class="admin-btns" style="margin-top:10px;">
         <button class="admin-cancel" onclick="closeAdmin()">닫기</button>
       </div>
     </div>
@@ -752,11 +768,54 @@ function saveMemo(doSave){
 // 관리 탭 전환
 function switchAdminTab(tab){
   document.querySelectorAll('.admin-tab').forEach((b,i)=>{
-    b.classList.toggle('on', (i===0&&tab==='accounts')||(i===1&&tab==='logs'));
+    b.classList.toggle('on', (i===0&&tab==='accounts')||(i===1&&tab==='logs')||(i===2&&tab==='chats'));
   });
   document.getElementById('adm-pane-accounts').classList.toggle('on', tab==='accounts');
   document.getElementById('adm-pane-logs').classList.toggle('on', tab==='logs');
+  document.getElementById('adm-pane-chats').classList.toggle('on', tab==='chats');
   if(tab==='logs') loadCallLogs();
+  if(tab==='chats') loadChatClearList();
+}
+
+function loadChatClearList(){
+  const container=document.getElementById('chat-clear-list');
+  const msg=document.getElementById('chat-clear-msg');
+  if(msg) msg.textContent='';
+  // 원장↔각 유저 조합
+  const others=ACCOUNTS.filter(a=>a.id!=='wonjang');
+  container.innerHTML=others.map(u=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#f7f7fb;border-radius:8px;padding:9px 12px;">
+      <span style="font-size:12px;font-weight:600;color:#1a1a2e;">원장 ↔ ${u.label}</span>
+      <button onclick="clearOneChat('${u.id}')"
+        style="background:#E53E3E;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">
+        삭제
+      </button>
+    </div>`).join('');
+}
+
+async function clearOneChat(uid){
+  if(!confirm(`원장 ↔ ${acct(uid)?.label} 대화내용을 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`)) return;
+  const msg=document.getElementById('chat-clear-msg');
+  try{
+    await db.ref('msgs/'+mkey('wonjang',uid)).remove();
+    if(msg){msg.style.color='#1D9E75';msg.textContent='✅ 삭제 완료: '+acct(uid)?.label;}
+    // 현재 열려 있는 채팅이면 화면 갱신
+    if(peer===uid||me===uid) renderApp();
+  }catch(e){
+    if(msg){msg.style.color='#E53E3E';msg.textContent='삭제 실패: '+e.message;}
+  }
+}
+
+async function clearAllChats(){
+  if(!confirm('⚠️ 모든 대화내용을 삭제하시겠습니까?\n삭제 후 복구할 수 없습니다.')) return;
+  const msg=document.getElementById('chat-clear-msg');
+  try{
+    await db.ref('msgs').remove();
+    if(msg){msg.style.color='#1D9E75';msg.textContent='✅ 전체 대화 삭제 완료';}
+    renderApp();
+  }catch(e){
+    if(msg){msg.style.color='#E53E3E';msg.textContent='삭제 실패: '+e.message;}
+  }
 }
 
 // 통화기록 로드
@@ -888,13 +947,8 @@ function showLogin(err){
 function pickUser(id){
   selId=id;
   document.querySelectorAll('.user-btn').forEach(b=>b.classList.toggle('sel',b.textContent===acct(id)?.label));
-  // 관리자 계정은 비번 숨김, 비관리자는 보이도록
   const pwEl=document.getElementById('pw');
-  if(pwEl){
-    pwEl.type=isAdmin(id)?'password':'text';
-    pwEl.value='';
-    pwEl.focus();
-  }
+  if(pwEl){pwEl.value='';pwEl.focus();}
 }
 // GUEST_IDS는 위에서 이미 선언됨 (로그인마다 대화 초기화)
 
@@ -904,17 +958,20 @@ function doLogin(){
   const a=acct(selId);
   if(!a||pw!==a.pw){showLogin('비밀번호가 맞지 않습니다.');return;}
   me=selId;localStorage.setItem('hangang_me',me);
-  unread={};peer=null;setMeBadge(a.label);
+  unread={};setMeBadge(a.label);
   registerPresence();
-  // 게스트(접수1·접수2·guest1·guest2)는 로그인 시 원장과의 대화 내용 초기화
-  if(GUEST_IDS.includes(me)){
+  // guest1·guest2 → 원장과 자동 연결 (대화 내용 초기화 후)
+  const isGuest=(me==='guest1'||me==='guest2');
+  if(isGuest){
+    peer='wonjang';
     const chatKey='msgs/'+mkey(me,'wonjang');
     db.ref(chatKey).remove().then(()=>{
-      // 읽음 기록도 초기화
       localStorage.removeItem(lrKey('wonjang'));
       initUnreadThenRender();
     }).catch(()=>initUnreadThenRender());
   } else {
+    // 원장·접수1·접수2·대기모드 → 대화상대 선택 화면
+    peer=null;
     initUnreadThenRender();
   }
 }
@@ -1226,8 +1283,8 @@ function renderMsgs(msgs){
 
 function selectPeer(uid){stopChat();peer=uid;unread[uid]=0;setLR(uid);renderApp();}
 function sanitizePeer(){
-  // 관리자 아닌 경우 원장과 자동 연결
-  if(!isAdmin(me)){
+  // guest만 원장과 자동 연결, 나머지는 peer 그대로
+  if(me==='guest1'||me==='guest2'){
     peer='wonjang';
   }
 }
