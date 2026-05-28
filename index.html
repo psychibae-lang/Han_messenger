@@ -602,10 +602,10 @@ async function startCall(withVideo=false){
 // 수신 감지 시작
 function startCallListener(){
   if(callListenerRef) callListenerRef.off();
-  // 나를 callee로 하는 통화 감지 (비관리자는 원장에서 오는 것만)
-  const others=isAdmin(me)
-    ? ACCOUNTS.filter(a=>a.id!==me)
-    : [ACCOUNTS.find(a=>a.id==='wonjang')].filter(Boolean);
+  // guest만 원장에서 오는 통화만 감지, 나머지는 전체
+  const others=(me==='guest1'||me==='guest2')
+    ? [ACCOUNTS.find(a=>a.id==='wonjang')].filter(Boolean)
+    : ACCOUNTS.filter(a=>a.id!==me);
   others.forEach(u=>{
     const ck=db.ref('calls/'+ckey(me,u.id));
     ck.on('value',snap=>{
@@ -1167,10 +1167,10 @@ function canManage(id){return isAdmin(id);}
 
 function renderApp(){
   const myA=acct(me);
-  // 원장은 전체 목록, 나머지는 원장만 표시
-  const others=isAdmin(me)
-    ? ACCOUNTS.filter(a=>a.id!==me)
-    : [ACCOUNTS.find(a=>a.id==='wonjang')].filter(Boolean);
+  // 원장·접수 전체 목록, guest만 원장으로 제한
+  const others=(me==='guest1'||me==='guest2')
+    ? [ACCOUNTS.find(a=>a.id==='wonjang')].filter(Boolean)
+    : ACCOUNTS.filter(a=>a.id!==me);
   const sideHtml=others.map(u=>`
     <div class="uitem${peer===u.id?' active':''}" onclick="selectPeer('${u.id}')">
       <div class="av-wrap">
